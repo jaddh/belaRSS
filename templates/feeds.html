@@ -1,0 +1,28 @@
+{% extends 'index.html' %}
+
+{% block header %}
+    <h1 class="my-4">Feeds </h1>
+{% endblock %}
+
+{% block content %}
+    {% for feed in feeds %}
+        <div class="card mb-4 w-100">
+            <div class="card-header w-100">
+                <p class="card-text"><span class="badge badge-primary badge-pill"> {{ feed.entry_count }}</span>  {{ feed.title | safe }}</p>
+                <!-- subtitle -->
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <p class="card-text">{{ feed.subtitle | safe }}</p><br>
+                    Last updated: {{ feed.last_updated }}
+                </div>
+                <div class="row">
+                </div>
+            </div>
+            <!-- Footer with two buttons -->
+            <div class="card-footer">
+                <a href="{{ url_for('entries', start = 0, limit=50, feed_id=feed.url) }}" class="btn btn-primary btn-block">View Feed</a>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

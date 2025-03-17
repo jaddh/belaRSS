@@ -1,0 +1,49 @@
+{% extends 'index.html' %}
+
+{% block header %}
+    <h1 class="my-4">Add New Feed</h1>
+{% endblock %}
+
+{% block content %}
+    <form id="addFeedForm">
+        <div class="form-group">
+            <label for="feedType">Feed Type</label>
+            <select class="form-control" id="feedType" name="type">
+                <option value="twitter">Twitter</option>
+                <option value="telegram">Telegram</option>
+                <option value="rss">RSS</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="feedTitle">Feed Title</label>
+            <input type="text" class="form-control" id="feedTitle" name="title" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Feed</button>
+    </form>
+
+    <script>
+        document.getElementById('addFeedForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+
+            fetch('/add_feed', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert(data.message);
+                    event.target.reset();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+{% endblock %}

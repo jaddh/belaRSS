@@ -1,0 +1,23 @@
+<div class="bRSS_sidebar h-100">
+    <h5 class="sidebar-heading">BelaRSS - {{page}}</h5>
+    <ul class="nav nav-pills flex-column mb-auto ">
+        <li class="nav-item">
+            <a class="nav-link {% if page == 'Entries' %}active{% endif %}" aria-current="page" href="{{ url_for('entries', start = 0, limit=50) }}">
+                <i class="bi bi-sticky"></i>
+                Entries
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if page == 'Feeds' %}active{% endif %}" href="{{ url_for('feeds') }}">
+                <i class="bi bi-rss"></i>
+                Feeds
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if page == 'New Feed' %}active{% endif %}" href="{{ url_for('new_feed') }}">
+                <i class="bi bi-plus"></i>
+                New Feed
+            </a>
+        </li>
+    </ul>
+</div>
