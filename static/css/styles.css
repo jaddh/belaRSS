@@ -6,14 +6,9 @@ body, main {
     height: 100%;
 }
 
-.card-header img, .card-header video {
+.card img, .card video {
     width: 100% !important;
     height: auto !important;
-}
-
-#sidebar {
-    height: 100%;
-    width: 250px;
 }
 
 .sidebar {

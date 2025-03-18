@@ -16,6 +16,12 @@ app = Flask(__name__)
 
 db = 'db.sqlite'
 
+@app.template_filter('load_json')
+def load_json_filter(s):
+    return json.loads(s)
+
+
+
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(db)

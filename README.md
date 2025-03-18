@@ -107,3 +107,9 @@ The application will be available at `http://localhost:5000`.
 ## License
 
 This project is licensed under the MIT License.
+
+## To commit to git: 
+1. git add .
+2. git commit -m "message"
+3. git push origin main
+```
