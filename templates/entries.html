@@ -13,12 +13,31 @@
         <div class="card mb-4 w-100">
             <div class="card-header w-100">
                 <h5 class="card-title">{{ entry.title }}</h5>
-                {% if entry.entities %}
-                    {% for entity in entry.entities | load_json %}  
-                        <span class="badge badge-primary m-1">{{ entity.word }}</span>
+                <!-- language badge-->
+                {% if entry.language %}
+                    <span class="badge badge-secondary m-1">{{ entry.language }}</span>
+                {% endif %}
+                {% if entry.LOC %}
+                    {% for location in entry.LOC | load_json %}  
+                        <span class="badge badge-danger m-1">{{ location }}</span>
                     {% endfor %}
                 {% endif %}
-
+                {% if entry.PER %}
+                    {% for person in entry.PER | load_json %}  
+                        <span class="badge badge-warning m-1">{{ person }}</span>
+                    {% endfor %}
+                {% endif %}
+                {% if entry.ORG %}
+                    {% for org in entry.ORG | load_json %}  
+                        <span class="badge badge-info m-1">{{ org }}</span>
+                    {% endfor %}
+                {% endif %}
+                {% if entry.MISC %}
+                    {% for misc in entry.MISC | load_json %}  
+                        <span class="badge badge-success m-1">{{ misc }}</span>
+                    {% endfor %}
+                {% endif %}
+                
             </div>
             <div class="card-body">
                 <div class="row">

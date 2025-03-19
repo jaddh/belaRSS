@@ -112,4 +112,12 @@ This project is licensed under the MIT License.
 1. git add .
 2. git commit -m "message"
 3. git push origin main
+
+
+## Crontab 
+
+```
+@reboot cd /home/jaddh/belaRSS/RSSHub && /home/jaddh/.local/share/pnpm/pnpm start pnmp
+0 * * * * cd /home/jaddh/belaRSS && /home/jaddh/belaRSS/.venv/bin/python update.py
+@reboot cd /home/jaddh/belaRSS && /home/jaddh/belaRSS/.venv/bin/python app.py
 ```

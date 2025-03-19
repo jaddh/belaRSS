@@ -5,7 +5,6 @@ from flask import Flask, g, render_template, send_file, request, jsonify
 import sqlite3
 import json
 from reader import make_reader
-from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 import matplotlib.pyplot as plt
 import requests
@@ -47,8 +46,6 @@ def update_feeds():
         print('Updating feeds at ' + str(datetime.now()))
         reader.update_feeds()
         print('Feeds updated! at ' + str(datetime.now()))
-
-print('Starting scheduler at ' + str(datetime.now()))
 
 @app.route('/<int:start>/<int:limit>')
 def entries(start=0, limit=50):
@@ -145,11 +142,6 @@ def chart():
     # return file to be opened in the browser
     return send_file('cache/chart.png', mimetype='image/png')
 
-
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=update_feeds, trigger="cron", minute="0")
-scheduler.start()
 
 
 if __name__ == '__main__':
