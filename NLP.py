@@ -6,6 +6,7 @@ from camel_tools.ner import NERecognizer
 from camel_tools.tokenizers.word import simple_word_tokenize
 import time
 from langdetect import detect
+from georeference import Geolocate
 
 class belaNER():
     
@@ -90,7 +91,8 @@ class belaNER():
 def extract_entities():
     conn = sqlite3.connect('db.sqlite')
     cursor = conn.cursor()
-
+    
+    geolocate = Geolocate(cursor)
 
     # Retrieve the 10 most recent entries (assuming 'id' represents the order)
     cursor.execute("SELECT id, title, summary FROM entries WHERE entities IS NULL ORDER BY published DESC")
@@ -142,13 +144,16 @@ def extract_entities():
             organizations = [entity['word'] for entity in entities if 'ORG' in entity['entity']]
             persons = [entity['word'] for entity in entities if 'PER' in entity['entity']]
             
+        if len(locations) > 0:
+            geolocate.geolocate(locations)
+            
         cursor.execute("""
             UPDATE entries 
             SET entities = ?, 
                 LOC = ?, 
                 ORG = ?, 
                 PER = ?,
-                language = ?
+                language = ? 
             WHERE id = ?
         """, (json.dumps(entities), 
             json.dumps(locations) if locations else None, 
@@ -160,5 +165,7 @@ def extract_entities():
         # every 50 entries, commit the changes
         if i % 50 == 0:
             conn.commit()
-        
+    
+    conn.commit()
+    
     conn.close()

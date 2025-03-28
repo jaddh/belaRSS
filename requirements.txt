@@ -45,6 +45,7 @@ joblib==1.4.2
 keras==3.9.0
 keyring==25.6.0
 kiwisolver==1.4.8
+langdetect==1.0.9
 libclang==18.1.1
 Markdown==3.7
 markdown-it-py==3.0.0
@@ -72,6 +73,7 @@ pyloco==0.0.139
 pyparsing==3.2.1
 pyrsistent==0.20.0
 python-dateutil==2.9.0.post0
+python-dotenv==1.1.0
 pytz==2025.1
 PyYAML==6.0.2
 reader==3.16
@@ -86,6 +88,7 @@ scikit-learn==1.6.1
 scipy==1.15.2
 SecretStorage==3.3.3
 sgmllib3k==1.0.0
+shapely==2.0.7
 SimpleWebSocketServer==0.1.2
 six==1.17.0
 soupsieve==2.6

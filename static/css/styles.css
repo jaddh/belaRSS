@@ -49,3 +49,6 @@ body, main {
 .nav-item {
     margin: 0.5rem 0;
 }
+
+#map { height: 100%; 
+width:100%;}

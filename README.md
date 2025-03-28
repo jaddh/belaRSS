@@ -1,16 +1,44 @@
 # belaRSS
 
-belaRSS is a simple RSS reader application built with Flask. It allows users to add and manage feeds from various sources including Twitter, Telegram, and RSS.
+belaRSS is a news Agrigator that collects news posts from a custom collection of feeds. Posts are updated every hour and are analysed using machine learning models to extract entities, georeference etc. 
 
-## Features
+![alt text](docs_images/SCREENSHOT.png "Screen shot of the BelaRSS interface")
 
-- Add new feeds (Twitter, Telegram, RSS)
-- View entries from feeds
-- Filter entries by feed
-- Pagination for entries
-- Sidebar for easy navigation
-- Update feeds periodically
-- View a chart of the number of publications per hour for the last 48 hours
+# Features
+
+## Entries
+The entries page displays all the most recent entries. The number of entries are selected by: 
+- The Number of entries to see 
+- The starting point
+
+## Feeds
+Displays the feeds that are updated hourly, with basic information for each feed: number of posts etc. 
+
+## New Feed
+This is where you can add a new feed. So far belaRSS supports: 
+- Twitter
+- Instagram 
+- RSS 
+- Telegram 
+
+# Machine Learning
+
+## Autotagging: 
+
+BelaRSS leverages the power of machine learning through open source models. 
+
+- Language detection: Each post has its main language automatically detected
+
+- Entity extraction: Each post gets its entities extracted: 
+    - LOC: Locations (in red)
+    - PER: Persons (in blue)
+    - ORG: Organisations (in yellow)
+
+## Georeferencing: 
+
+If a post mentions locations then it is automatically georeferenced using google geolocation API. 
+
+To access the google API console: https://console.cloud.google.com
 
 ## Installation
 
@@ -41,33 +69,24 @@ belaRSS is a simple RSS reader application built with Flask. It allows users to 
     python app.py
     ```
 
+
+# RSSHUB 
+
+You can install RSShub from git and run using pnmp start
+
+````
+pnpm add rsshub
+pnmp start
+````
+RSShub runs on port 1200 (so all the links need to link to localhost:1200)
+
+The .env file is saved in the RSShub folder
+
+## Twitter
+- Twitter either uses passwords
+- Or auth token (may need to be changed once in a while)
+
 ## API Endpoints
-
-### Add a New Feed
-
-- **URL:** `/add_feed`
-- **Method:** `POST`
-- **Request Body:**
-    ```json
-    {
-        "type": "rss" | "twitter" | "telegram",
-        "title": "Feed Title",
-        "url": "Feed URL"
-    }
-    ```
-- **Response:**
-    - Success: `201 Created`
-        ```json
-        {
-            "message": "Feed added successfully"
-        }
-        ```
-    - Error: `400 Bad Request`
-        ```json
-        {
-            "message": "Error message"
-        }
-        ```
 
 ## Templates
 
@@ -83,11 +102,6 @@ Template to display entries with pagination.
 
 Form to add a new feed.
 
-## Static Files
-
-### `styles.css`
-
-Custom styles for the application, including the sidebar.
 
 ## Database
 

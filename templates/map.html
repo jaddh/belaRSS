@@ -1,0 +1,30 @@
+<div id="map"></div>
+<script> var map = L.map('map').setView([34.8021, 38.9968], 7);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+var heat = L.heatLayer([
+        {% for entry in entries %}
+            {% if entry.LOC %}
+                {% for location in entry.LOC | load_json %}  
+                    {% if location in locations %}
+                        [{{ locations[location] | wkt_to_coord }}, 50], 
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        ], {radius:100}).addTo(map);
+
+        {% for entry in entries %}
+            {% if entry.LOC %}
+                {% for location in entry.LOC | load_json %}  
+                    {% if location in locations %}
+                        var marker = L.marker([{{ locations[location] | wkt_to_coord }}]).addTo(map);
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+
+</script>

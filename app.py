@@ -8,6 +8,7 @@ from reader import make_reader
 from datetime import datetime
 import matplotlib.pyplot as plt
 import requests
+from shapely import wkt
 
 reader = make_reader('db.sqlite')
 
@@ -19,7 +20,10 @@ db = 'db.sqlite'
 def load_json_filter(s):
     return json.loads(s)
 
-
+@app.template_filter('wkt_to_coord')
+def wkt_to_coord(s):
+    geometry = wkt.loads(s)
+    return "{}, {}".format(geometry.y, geometry.x)
 
 def get_db():
     if 'db' not in g:
@@ -50,17 +54,20 @@ def update_feeds():
 @app.route('/<int:start>/<int:limit>')
 def entries(start=0, limit=50):
     # if feed in url parameter, get the feed
-    feed = request.args.get('feed', None)
+    feed = request.args.get('feed_id', None)
     entries = list(get_top_entries(start, limit, feed))
     # also print the total number of entries in the database
     cursor = get_db().cursor()
     cursor.execute('SELECT COUNT(*) FROM entries')
     total_entries = cursor.fetchone()[0]
     print('Total entries: ' + str(total_entries))
+    locations = cursor.execute("SELECT label, geometry from locations where geometry != 'POINT (38.996815 34.80207499999999)'")
+    locations = {row['label']: row['geometry'] for row in locations}
     # render template from file index.html
     return render_template('entries.html',
                            feed=feed,
-                           entries=entries, 
+                           entries=entries,
+                           locations = locations, 
                            start=start, 
                            limit=limit, 
                            total_entries=total_entries, 
@@ -101,6 +108,8 @@ def add_feed():
         url = "http://localhost:1200/twitter/user/{}".format(data.get('title'))
     elif feed_type == 'telegram':
         url = "http://localhost:1200/telegram/channel/{}".format(data.get('title'))
+    elif feed_type == 'instagram':
+        url = "http://localhost:1200/picnob/user/{}".format(data.get('title'))
     else:
         return jsonify({'message': 'Invalid feed type'}), 400
     

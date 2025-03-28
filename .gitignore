@@ -12,4 +12,8 @@ db.sqlite-journal
 db.sqlite.search
 belaRSS_proxy
 
+.env
+
+db.sqlite
+
 
