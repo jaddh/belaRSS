@@ -1,0 +1,15 @@
+{% extends 'index.html' %}
+
+{% block header %}
+    <h1 class="my-4">Search in News Articles</h1>
+{% endblock %}
+
+{% block content %}
+    <form method="POST" action="{{ url_for('search_results') }}" class="mb-4">
+        <div class="form-group">
+            <label for="query">Enter keywords (comma-separated):</label>
+            <input type="text" class="form-control" id="query" name="query" placeholder="e.g. Syria, conflict, water">
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Search</button>
+    </form>
+{% endblock %}

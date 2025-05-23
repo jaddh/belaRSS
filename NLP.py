@@ -132,11 +132,11 @@ def extract_entities():
         
         if language == 'ar':
             print("Extracting entities from the sentence:", title)
-            entities = ner_extractor.extract_entities(title, language='ar') 
+            entities = ner_extractor.extract_entities(title[0:200], language='ar') 
             print("Entities:", entities)
         else:
             print("Extracting entities from the sentence:", title)
-            entities = ner_extractor.extract_entities(title, language='en')
+            entities = ner_extractor.extract_entities(title[0:200], language='en')
             print("Entities:", entities)
 
         if entities:

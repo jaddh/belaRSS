@@ -1,7 +1,7 @@
 # run a simple flask app
 import matplotlib
 matplotlib.use('Agg')  # Use a non-interactive backend
-from flask import Flask, g, render_template, send_file, request, jsonify
+from flask import Flask, g, render_template, send_file, request, jsonify, redirect, url_for
 import sqlite3
 import json
 from reader import make_reader
@@ -31,49 +31,43 @@ def get_db():
         g.db.row_factory = sqlite3.Row
     return g.db
 
-def get_top_entries(start=0, limit=10, feed=None):
-    cursor = get_db().cursor()
-    if feed:
-        sql = "SELECT * FROM entries WHERE feed = '{}' ORDER BY published DESC LIMIT {} OFFSET {}".format(feed, limit, start)
-    else:
-        sql = 'SELECT * FROM entries ORDER BY published DESC LIMIT {} OFFSET {}'.format(limit, start)
-    cursor.execute(sql)
-    entries = cursor.fetchall()
-    for entry in entries:
-        entry_dict = dict(entry)
-        if entry_dict.get('enclosures'):
-            entry_dict['enclosures'] = json.loads(entry_dict['enclosures'])
-        yield entry_dict
 
-def update_feeds():
-    with app.app_context():
-        print('Updating feeds at ' + str(datetime.now()))
-        reader.update_feeds()
-        print('Feeds updated! at ' + str(datetime.now()))
-
-@app.route('/<int:start>/<int:limit>')
-def entries(start=0, limit=50):
-    # if feed in url parameter, get the feed
+@app.route('/entries/<int:year>/<int:month>/<int:day>')
+def entries(year=0, month=0, day=0):
     feed = request.args.get('feed_id', None)
-    entries = list(get_top_entries(start, limit, feed))
-    # also print the total number of entries in the database
-    cursor = get_db().cursor()
-    cursor.execute('SELECT COUNT(*) FROM entries')
-    total_entries = cursor.fetchone()[0]
-    print('Total entries: ' + str(total_entries))
-    locations = cursor.execute("SELECT label, geometry from locations where geometry != 'POINT (38.996815 34.80207499999999)'")
-    locations = {row['label']: row['geometry'] for row in locations}
-    # render template from file index.html
+
+    # If any component is zero, use today's date
+    if year == 0 or month == 0 or day == 0:
+        today = datetime.today()
+        return redirect(url_for('entries', year=today.year, month=today.month, day=today.day))
+        
+    # Create date range for the selected day
+    date_str = f"{year:04d}-{month:02d}-{day:02d}"
+    date_start = f"{date_str} 00:00:00"
+    date_end = f"{date_str} 23:59:59"
+
+    # Get locations
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT label, geometry FROM locations WHERE geometry != 'POINT (38.996815 34.80207499999999)'")
+    locations = {row['label']: row['geometry'] for row in cursor.fetchall()}
+
+    # Get entries published on that day
+    sql = """
+        SELECT * FROM entries 
+        WHERE datetime(published) BETWEEN ? AND ? 
+        ORDER BY published DESC 
+    """
+    cursor.execute(sql, (date_start, date_end))
+    entries = cursor.fetchall()
+
     return render_template('entries.html',
-                           feed=feed,
                            entries=entries,
-                           locations = locations, 
-                           start=start, 
-                           limit=limit, 
-                           total_entries=total_entries, 
-                           next_start=start + limit, 
-                           prev_start=start - limit,
-                           page = "Entries")
+                           locations=locations,
+                           page="Entries", 
+                           year = year, 
+                           day = day, 
+                           month = month)
         
 @app.route('/feeds')
 def feeds():
@@ -84,12 +78,60 @@ def feeds():
     return render_template('feeds.html', 
                            feeds=feeds,
                            page = "Feeds")
+    
+@app.route('/search', methods=['GET'])
+def search_form():
+    return render_template('search_form.html', 
+                           page = "Search")
+    
+@app.route('/search', methods=['POST'])
+def search_results():
+    query = request.form.get('query', '')
+    keywords = [kw.strip() for kw in query.split(',') if kw.strip()]
 
+    if not keywords:
+        return 'No valid keywords provided.', 400
+
+    cursor = get_db().cursor()
+
+    # Build SQL query dynamically using OR conditions
+    conditions = " OR ".join([
+        "(title LIKE ? OR summary LIKE ? OR content LIKE ?)"
+        for _ in keywords
+    ])
+    parameters = []
+    for kw in keywords:
+        wildcard = f"%{kw}%"
+        parameters.extend([wildcard, wildcard, wildcard])
+
+    sql = f"SELECT * FROM entries WHERE {conditions} ORDER BY published DESC LIMIT 100"
+    cursor.execute(sql, parameters)
+    results = cursor.fetchall()
+
+    return render_template('entries.html',
+                           feed=None,
+                           entries=results,
+                           locations={},
+                           start=0,
+                           limit=100,
+                           total_entries=len(results),
+                           next_start=0,
+                           prev_start=0,
+                           page="Search Results")
+
+# update the feeds
 # update the feeds
 @app.route('/update')
 def update():
-    update_feeds()
-    return 'Feeds updated!'
+    feed_url = request.args.get('feed')
+    if feed_url:
+        try:
+            reader.update_feed(feed_url)
+        except Exception as e:
+            return f'Error updating feed {feed_url}: {str(e)}', 400
+    else:
+        reader.update_feeds()
+        return 'All feeds updated!', 200
 
 @app.route('/new_feed')
 def new_feed():
@@ -130,35 +172,38 @@ def close_db(exception):
     if db is not None:
         db.close()
         
-# route that returns a chart of the number of publications per hour for the last 7 days
-@app.route('/chart')
-def chart():
-    cursor = get_db().cursor()
-    cursor.execute('SELECT COUNT(*) as count, strftime("%Y-%m-%d %H", published) as hour FROM entries WHERE published > datetime("now", "-4 days") GROUP BY hour')
-    rows = cursor.fetchall()
-    # render chart in matplotlib
 
-    hours = [row['hour'] for row in rows]
-    counts = [row['count'] for row in rows]
-    plt.bar(hours, counts)
-    plt.xlabel('Hour')
-    plt.ylabel('Number of publications')
-    plt.title('Number of publications per hour for the last 48 hours')
-    plt.xticks(rotation=45, ha='right', fontsize=3)
-    plt.tight_layout()
-    plt.savefig('cache/chart.png', dpi=300)
-    plt.close()
-    # return file to be opened in the browser
-    return send_file('cache/chart.png', mimetype='image/png')
+
+@app.route('/calendar/heatmap')
+def heatmap_data():
+    conn = sqlite3.connect('db.sqlite')
+    cursor = conn.cursor()
+
+    query = """
+        SELECT 
+            DATE(published) AS date,
+            COUNT(*) AS count
+        FROM 
+            entries
+        GROUP BY 
+            DATE(published)
+    """
+    cursor.execute(query)
+    rows = cursor.fetchall()
+
+    # Convert to UNIX timestamps for the JS heatmap
+    heatmap_data = {}
+    for date_str, count in rows:
+        if date_str:
+            ts = int(datetime.strptime(date_str, "%Y-%m-%d").timestamp())
+            heatmap_data[ts] = count
+
+    return jsonify(heatmap_data)
 
 
 
 if __name__ == '__main__':
-    try:
-        app.run(host="0.0.0.0", debug=True)
-    except Exception as e:
-        print(e)
-        scheduler.shutdown()
+    app.run(host="0.0.0.0", debug=True)
 
 
 # This is a simple Flask app that runs a web server on port 5000.

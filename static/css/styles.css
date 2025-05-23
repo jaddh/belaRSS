@@ -11,6 +11,8 @@ body, main {
     height: auto !important;
 }
 
+
+
 .sidebar {
     position: fixed;
     top: 0;
@@ -39,7 +41,7 @@ body, main {
 
 .nav-link {
     font-weight: 500;
-    color: #ffffff
+    color: black
 }
 
 .nav-link:hover {
@@ -52,3 +54,23 @@ body, main {
 
 #map { height: 100%; 
 width:100%;}
+
+.card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ✅ White text in subdomains */
+.cal-heatmap-container .subdomain-text {
+fill: white !important;
+}
+
+/* Optional: bold domain labels */
+.cal-heatmap-container .graph-label {
+font-weight: bold;
+}
+
+.subdomain-current {
+    stroke: #fff;
+    stroke-width: 2px;
+    fill: #007bff !important; /* Bootstrap blue or any color */
+  }

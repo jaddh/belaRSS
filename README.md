@@ -135,3 +135,7 @@ This project is licensed under the MIT License.
 0 * * * * cd /home/jaddh/belaRSS && /home/jaddh/belaRSS/.venv/bin/python update.py
 @reboot cd /home/jaddh/belaRSS && /home/jaddh/belaRSS/.venv/bin/python app.py
 ```
+
+To stop the app process: 
+ps aux | grep scriptname
+kill PID

@@ -1,0 +1,16 @@
+{% extends 'index.html' %}
+
+{% block header %}
+    <h1 class="my-4">Tags </h1>
+{% endblock %}
+
+{% block content %}
+    {% for tag in tags %}
+        <div class="card mb-2 p-2 d-inline-block position-relative">
+            <span class="badge bg-primary position-absolute top-0 start-100 translate-middle rounded-pill">
+                {{ tag.count }}
+            </span>
+            {{ tag.org }}
+        </div>
+    {% endfor %}
+{% endblock %}

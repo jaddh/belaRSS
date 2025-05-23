@@ -14,27 +14,32 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
     <script src="{{ url_for('static', filename='js/HeatLayer.js') }}"></script>
+    <script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.min.js"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.css" />
 </head>
 <body class="bg-light">
         <div class="container-fluid h-100">
             <div class="row h-100">
                 <!-- Sidebar -->
-                <nav id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark">
+                <nav id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-dark bg-grey">
                     {% include 'sidebar.html' %}
                 </nav>
                 <!-- Main content -->
                 <main role="main" class="justify-content-center flex-grow-1 h-100 overflow-auto p-0">
-                    <div class="row p-0 justify-content-cente h-100">
-                        <div style="width: 60%; height:100%" class="p-0">
-                            {% block map %}
-                            {% endblock %}
-                        </div>
-                        <div class="container d-flex flex-wrap justify-content-center overflow-auto" style="width: 40%; height:100%">
+                    <div class="row p-0 justify-content-center h-100">
+                        <div class="container d-flex flex-wrap justify-content-center overflow-auto " style="width: 40%; height:100%">
                             <div>
                                 {% block header %}
                                 {% endblock %}
                             </div>
-                            {% block content %}
+                            <div class="container p-5">
+                                {% block content %}
+                                {% endblock %}
+                            </div>
+                        </div>
+                        <div style="width: 60%; height:100%" class="p-0">
+                            {% block map %}
                             {% endblock %}
                         </div>
                     </div>

@@ -14,14 +14,15 @@
             <div class="card-body">
                 <div class="row">
                     <p class="card-text">{{ feed.subtitle | safe }}</p><br>
-                    Last updated: {{ feed.last_updated }}
+                    Last updated: {{ feed.last_updated }}<br>
+                    {{ feed.url }}
                 </div>
                 <div class="row">
                 </div>
             </div>
             <!-- Footer with two buttons -->
             <div class="card-footer">
-                <a href="{{ url_for('entries', start = 0, limit=50, feed_id=feed.url) }}" class="btn btn-primary btn-block">View Feed</a>
+                <!--<a href=" url_for('entries', feed_id=feed.url) " class="btn btn-primary btn-block">View Feed</a> -->
             </div>
         </div>
     {% endfor %}

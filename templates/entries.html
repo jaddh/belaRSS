@@ -1,11 +1,7 @@
 {% extends 'index.html' %}
 
 {% block header %}
-    <h1 class="my-4">Entries ({{limit}} / {{total_entries}})</h1>
-    <a href="{{ url_for('entries', start=next_start, limit = limit) }}" class="btn btn-primary btn-block">Next Page</a>
-    {% if prev_start > 0 %}
-        <a href="{{ url_for('entries', start=prev_start, limit = limit) }}" class="btn btn-primary btn-block">Previous Page</a>
-    {% endif %}
+    
 {% endblock %}
 
 {% block map %}
@@ -49,20 +45,30 @@
                 <div class="row">
                     
                     <p class="card-text">{{ entry.summary | safe }}</p>
+
+                    <br>
+
+                    {% if entry.content %}
+                        Full content:<br>
+                        {% set content = entry.content | load_json %}
+                        {{ content[0]['value'] | safe }}
+                    {% endif %}
                     
                 </div>
                 <div class="row">
                     {% if entry.enclosures %}
                         {% for enclosure in entry.enclosures %}
-                            <div class="row p-3">
-                                <img class="img-fluid img-thumbnail" src="{{ enclosure.href }}" alt="{{ enclosure.title }}">
-                            </div>
+                            {% if enclosure.href %}
+                                <div class="row p-3">
+                                    <img class="img-fluid img-thumbnail" src="{{ enclosure.href }}" alt="{{ enclosure.title }}">
+                                </div>
+                            {% endif %}
                         {% endfor %}
                     {% endif %}
                 </div>
             </div>
             <div class="card-footer">
-                {{ entry.published }}
+                {{ entry.published }} (UTC) 
                 <a href="{{ entry.link }}" class="card-link">{{ entry.link.split('/')[2] }}</a>
             </div>
         </div>
